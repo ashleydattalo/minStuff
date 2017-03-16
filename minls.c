@@ -51,6 +51,9 @@ int main(int argc, char *const argv[])
    exit(EXIT_SUCCESS);
 }
 
+/* given an inode, this function goes through all 
+the zones (direct, indirect and double) and prints
+out the files/directories associated with the inode */
 void printInodeFiles(struct inode *in) {
    // printInode(*in);
    if (MIN_ISREG(in->mode)) {
@@ -66,6 +69,8 @@ void printInodeFiles(struct inode *in) {
    }
 }
 
+/*given a list of file entries, this function goes through
+and prints out the name of each file */
 void printFiles(struct fileEntry *fileEntries, int numFiles) {
    int i;
    for(i = 0; i < numFiles; i++) {
@@ -76,6 +81,9 @@ void printFiles(struct fileEntry *fileEntries, int numFiles) {
    }
 }
 
+/* given a file, this function calls the necessary
+functions to print the file information, including
+the permissions, size and name of the file*/
 void printFile(struct fileEntry *file) {
    // printf("%d ", file->inode);
    struct inode *iNode = (struct inode *) getInode(file->inode);
@@ -93,6 +101,8 @@ void printFile(struct fileEntry *file) {
    }
 }
 
+/*given a mode, this function prints out
+the permissions of a file*/
 void printPermissions(uint16_t mode) {
    printSinglePerm(MIN_ISDIR(mode), 'd');
    printSinglePerm(mode & MIN_IRUSR, 'r');
@@ -106,6 +116,7 @@ void printPermissions(uint16_t mode) {
    printSinglePerm(mode & MIN_IXOTH, 'x');
 }
 
+/*prints a single permission for a file */
 void printSinglePerm(int print, char c) {
    if (print) {
       printf("%c", c);
@@ -115,6 +126,7 @@ void printSinglePerm(int print, char c) {
    }
 }
 
+/*prints out partition data*/
 void printPartition(struct part_entry  partitionPtr) {
    printf("  %X\n", partitionPtr.bootind);
    printf("  %X\n", partitionPtr.start_head);
@@ -124,10 +136,11 @@ void printPartition(struct part_entry  partitionPtr) {
    printf("  %X\n", partitionPtr.last_head);
    printf("  %X\n", partitionPtr.last_sec);
    printf("  %X\n", partitionPtr.last_cyl);
-   printf("  %lX\n", (unsigned long) partitionPtr.lowsec);
-   printf("  %lX\n", (unsigned long) partitionPtr.size);
+   printf("  %lX\n", partitionPtr.lowsec);
+   printf("  %lX\n", partitionPtr.size);
 }
 
+/*prints out superblock data*/
 void printSuperblock(struct superblock sb) {
    puts("SuperBlock: ");
    printf("  ninodes: %d\n", sb.ninodes);
@@ -145,6 +158,7 @@ void printSuperblock(struct superblock sb) {
    printf("  subversion: %d\n", sb.subversion);
 }
 
+/*prints out inode data*/
 void printInode(struct inode in) {
    int z;
    puts("inode: ");

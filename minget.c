@@ -2,8 +2,10 @@
 
 char fullPath[PATH_MAX] = "";
 
+/*main for minget*/
 int main(int argc, char *const argv[])
 {
+	/*allocates space for all our command line parsed arguements*/
    struct minOptions options;
    options.verbose = 0;
    options.partition = -1;
@@ -14,12 +16,14 @@ int main(int argc, char *const argv[])
    options.destFile = malloc(PATH_MAX);
    options.hasDestFile = 0;
 
+   /*calls the function to parse the args*/
    parseArgs(argc, argv, &options, IS_MINGET);
    strcpy(fullPath, options.fullPath);
 
    struct minixConfig config;
    config.image = NULL;
 
+   /* gets the right image partition */
    getMinixConfig(options, &config);
    image = config.image;
    zone_size = config.zone_size;
@@ -29,23 +33,13 @@ int main(int argc, char *const argv[])
    fseekPartition(image, (2 + config.sb.i_blocks + 
    	config.sb.z_blocks) * config.sb.blocksize, SEEK_SET);
 
+   /* creates the itable */
    iTable = (struct inode*) malloc(numInodes * sizeof(struct inode));
    fread(iTable, sizeof(struct inode), numInodes, image);
-   // printf("numInode %d\n", numInodes);
-
-   // printInodeFiles(iTable);
-
-   // printInode(iTable[16]);
-   // printInodeFiles(&iTable[16]);
-   
-   // printf("\n");
-   // printf("\n");
-   // printf("\n");
    struct inode destFile = traversePath(iTable, 
    	config.sb.ninodes, options.path);
-   // printf("INODE RETURNED: \n");
-   // printInodeFiles(&destFile);
 
+   /* redirects to stdout or destionation path user specified*/
 	char *data = copyZones(destFile);
 	if (options.hasDestFile == HAS_DESTFILE) {
 		FILE *writeToThisFile = fopen(options.destFile, "w");
